@@ -154,3 +154,8 @@ How to orient after a reset: read "Status board" first, then the newest log entr
 - Cause: the texture pass (ramp jitter 0.55, flow-oriented rows) also scrambled the face. Now cells where the camera is >50% of the density use the isotropic tone ramp and 15% of the jitter (ascii.frag, camShare from the cell texture's 4th channel); smoke and haze keep their texture. Camera process applies an unsharp mask (BG_SHARPEN 0.8) to the drawn image; camera_bg.blur 0.3 -> 0, contrast 0.2 -> 0.25.
 - tests/verify_camera_smoke.py now also measures what the viewer sees: glyph-level clarity (mean drawn brightness per fine cell vs the camera image, 3x3 neighbourhood): 0.898 (previous render) -> 0.941. All camera checks PASS.
 - Last session had 2 long stalls (1.46 s at 19 s, 0.73 s at 27 s) with no export/screenshot/preset files written; most likely window dragging (Windows freezes the GLFW loop during a move). --verbose now logs every key action to attribute future stalls.
+
+### 2026-10-13 03:23 saved to GitHub; M6 deferred by the user
+- User: "leave M6 for now. now save everything to my github" (declined running M6 on a GitHub Actions macos-14 VM runner).
+- Private repo https://github.com/AmoghShet/audioviz (main, commit f5471cc): code, shaders, presets, tests, docs (incl. docs/PLAN.md copy of the plan), README, this log, research doc, bench scripts + JSON results. Excluded by .gitignore: .venv*, .cache/, out/ (renders and screenshots with the user's camera feed), bench/*.jpg|png (webcam stills and ASCII renders of them), models/ (MediaPipe, unused), all audio files.
+- Status: M0-M5, M7 DONE and verified on Windows; M6 DEFERRED (no Mac reachable; checklist docs/MAC_VALIDATION.md).
