@@ -1,0 +1,21 @@
+# environments
+.venv/
+.venv-cv4/
+__pycache__/
+*.pyc
+
+# generated: song feature cache, renders, screenshots, exports, verification frames
+.cache/
+out/
+
+# research-spike artefacts: webcam stills and ASCII renders of them, MediaPipe models (not used)
+bench/*.jpg
+bench/*.png
+models/
+
+# audio is never committed (songs are read from where they live)
+*.mp3
+*.wav
+*.flac
+*.m4a
+*.ogg

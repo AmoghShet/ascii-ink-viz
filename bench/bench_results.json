@@ -1,0 +1,554 @@
+{
+  "env": {
+    "python": "3.12.15",
+    "platform": "Windows-11-10.0.26300-SP0",
+    "machine": "AMD64",
+    "cpu_count": 12,
+    "numpy": "2.5.3",
+    "opencv": "5.0.0",
+    "opencv_opencl_available": true,
+    "opencv_threads": 12,
+    "opencv_video_io": [
+      "FFMPEG:                      YES (prebuilt binaries)",
+      "avcodec:                   YES (61.19.100)",
+      "avformat:                  YES (61.7.100)",
+      "avutil:                    YES (59.39.100)",
+      "swscale:                   YES (8.3.100)",
+      "avdevice:                  NO",
+      "GStreamer:                   NO",
+      "DirectShow:                  YES",
+      "Media Foundation:            YES",
+      "DXVA:                      YES",
+      "Orbbec:                      YES"
+    ],
+    "mediapipe": "1.1.0",
+    "moderngl": "5.12.0"
+  },
+  "camera": {
+    "note": "frames loaded from D:/AudioViz/bench/pose_sample.jpg"
+  },
+  "fft": {
+    "rfft_2048": {
+      "n": 300,
+      "mean_ms": 0.06,
+      "median_ms": 0.057,
+      "p95_ms": 0.069,
+      "min_ms": 0.056,
+      "max_ms": 0.343
+    }
+  },
+  "optical_flow": {
+    "DIS_ULTRAFAST_320x180": {
+      "n": 30,
+      "mean_ms": 0.958,
+      "median_ms": 0.941,
+      "p95_ms": 1.089,
+      "min_ms": 0.868,
+      "max_ms": 1.155
+    },
+    "DIS_FAST_320x180": {
+      "n": 30,
+      "mean_ms": 3.747,
+      "median_ms": 3.71,
+      "p95_ms": 3.994,
+      "min_ms": 3.55,
+      "max_ms": 4.286
+    },
+    "DIS_MEDIUM_320x180": {
+      "n": 30,
+      "mean_ms": 8.344,
+      "median_ms": 8.154,
+      "p95_ms": 8.954,
+      "min_ms": 7.737,
+      "max_ms": 9.242
+    },
+    "FARNEBACK_320x180": {
+      "n": 30,
+      "mean_ms": 21.96,
+      "median_ms": 21.777,
+      "p95_ms": 23.2,
+      "min_ms": 21.261,
+      "max_ms": 23.955
+    },
+    "DIS_ULTRAFAST_640x360": {
+      "n": 30,
+      "mean_ms": 3.485,
+      "median_ms": 3.417,
+      "p95_ms": 3.901,
+      "min_ms": 3.104,
+      "max_ms": 3.952
+    },
+    "DIS_FAST_640x360": {
+      "n": 30,
+      "mean_ms": 8.485,
+      "median_ms": 8.358,
+      "p95_ms": 9.165,
+      "min_ms": 7.87,
+      "max_ms": 9.359
+    },
+    "DIS_MEDIUM_640x360": {
+      "n": 30,
+      "mean_ms": 21.26,
+      "median_ms": 21.109,
+      "p95_ms": 22.802,
+      "min_ms": 19.86,
+      "max_ms": 23.281
+    },
+    "FARNEBACK_640x360": {
+      "n": 30,
+      "mean_ms": 95.22,
+      "median_ms": 92.341,
+      "p95_ms": 105.026,
+      "min_ms": 90.259,
+      "max_ms": 118.767
+    },
+    "DIS_ULTRAFAST_1280x720": {
+      "n": 30,
+      "mean_ms": 11.285,
+      "median_ms": 11.198,
+      "p95_ms": 12.275,
+      "min_ms": 10.075,
+      "max_ms": 12.768
+    },
+    "DIS_FAST_1280x720": {
+      "n": 30,
+      "mean_ms": 22.242,
+      "median_ms": 22.261,
+      "p95_ms": 23.64,
+      "min_ms": 20.703,
+      "max_ms": 24.358
+    },
+    "DIS_MEDIUM_1280x720": {
+      "n": 30,
+      "mean_ms": 69.319,
+      "median_ms": 68.503,
+      "p95_ms": 74.05,
+      "min_ms": 65.623,
+      "max_ms": 75.813
+    },
+    "preproc_gray_resize_320x180": {
+      "n": 30,
+      "mean_ms": 1.63,
+      "median_ms": 1.564,
+      "p95_ms": 2.012,
+      "min_ms": 1.403,
+      "max_ms": 2.247
+    }
+  },
+  "segmentation": {
+    "selfie_square_category_720p": {
+      "n": 30,
+      "mean_ms": 137.692,
+      "median_ms": 136.614,
+      "p95_ms": 144.887,
+      "min_ms": 133.506,
+      "max_ms": 146.084,
+      "mask_shape": [
+        720,
+        1280,
+        1
+      ],
+      "mask_dtype": "uint8"
+    },
+    "selfie_square_category_640x360": {
+      "n": 30,
+      "mean_ms": 43.974,
+      "median_ms": 43.041,
+      "p95_ms": 48.598,
+      "min_ms": 41.93,
+      "max_ms": 50.992,
+      "mask_shape": [
+        360,
+        640,
+        1
+      ],
+      "mask_dtype": "uint8"
+    },
+    "selfie_square_category_320x180": {
+      "n": 30,
+      "mean_ms": 20.233,
+      "median_ms": 19.13,
+      "p95_ms": 27.235,
+      "min_ms": 18.562,
+      "max_ms": 29.421,
+      "mask_shape": [
+        180,
+        320,
+        1
+      ],
+      "mask_dtype": "uint8"
+    },
+    "selfie_square_category_256x256": {
+      "n": 30,
+      "mean_ms": 20.642,
+      "median_ms": 20.373,
+      "p95_ms": 23.022,
+      "min_ms": 19.656,
+      "max_ms": 24.576,
+      "mask_shape": [
+        256,
+        256,
+        1
+      ],
+      "mask_dtype": "uint8"
+    },
+    "selfie_square_confidence_320x180": {
+      "n": 30,
+      "mean_ms": 12.166,
+      "median_ms": 12.087,
+      "p95_ms": 12.816,
+      "min_ms": 11.548,
+      "max_ms": 13.72,
+      "mask_shape": [
+        180,
+        320,
+        1
+      ],
+      "mask_dtype": "float32"
+    },
+    "selfie_square_confidence_256x256": {
+      "n": 30,
+      "mean_ms": 11.998,
+      "median_ms": 11.963,
+      "p95_ms": 12.579,
+      "min_ms": 11.455,
+      "max_ms": 12.911,
+      "mask_shape": [
+        256,
+        256,
+        1
+      ],
+      "mask_dtype": "float32"
+    },
+    "selfie_landscape_category_720p": {
+      "n": 30,
+      "mean_ms": 134.343,
+      "median_ms": 133.318,
+      "p95_ms": 141.383,
+      "min_ms": 130.311,
+      "max_ms": 149.138,
+      "mask_shape": [
+        720,
+        1280,
+        1
+      ],
+      "mask_dtype": "uint8"
+    },
+    "selfie_landscape_category_640x360": {
+      "n": 30,
+      "mean_ms": 38.418,
+      "median_ms": 37.853,
+      "p95_ms": 40.715,
+      "min_ms": 37.406,
+      "max_ms": 44.485,
+      "mask_shape": [
+        360,
+        640,
+        1
+      ],
+      "mask_dtype": "uint8"
+    },
+    "selfie_landscape_category_320x180": {
+      "n": 30,
+      "mean_ms": 14.787,
+      "median_ms": 14.645,
+      "p95_ms": 15.953,
+      "min_ms": 14.251,
+      "max_ms": 16.178,
+      "mask_shape": [
+        180,
+        320,
+        1
+      ],
+      "mask_dtype": "uint8"
+    },
+    "selfie_landscape_category_256x256": {
+      "n": 30,
+      "mean_ms": 15.993,
+      "median_ms": 15.769,
+      "p95_ms": 17.386,
+      "min_ms": 15.017,
+      "max_ms": 20.74,
+      "mask_shape": [
+        256,
+        256,
+        1
+      ],
+      "mask_dtype": "uint8"
+    },
+    "selfie_landscape_confidence_320x180": {
+      "n": 30,
+      "mean_ms": 7.239,
+      "median_ms": 7.184,
+      "p95_ms": 7.934,
+      "min_ms": 6.769,
+      "max_ms": 8.148,
+      "mask_shape": [
+        180,
+        320,
+        1
+      ],
+      "mask_dtype": "float32"
+    },
+    "selfie_landscape_confidence_256x256": {
+      "n": 30,
+      "mean_ms": 7.507,
+      "median_ms": 7.291,
+      "p95_ms": 8.713,
+      "min_ms": 6.901,
+      "max_ms": 9.866,
+      "mask_shape": [
+        256,
+        256,
+        1
+      ],
+      "mask_dtype": "float32"
+    },
+    "selfie_multiclass_category_720p": {
+      "n": 30,
+      "mean_ms": 371.027,
+      "median_ms": 369.079,
+      "p95_ms": 376.635,
+      "min_ms": 366.39,
+      "max_ms": 393.894,
+      "mask_shape": [
+        720,
+        1280,
+        1
+      ],
+      "mask_dtype": "uint8"
+    },
+    "selfie_multiclass_category_256x256": {
+      "n": 30,
+      "mean_ms": 224.954,
+      "median_ms": 223.9,
+      "p95_ms": 233.286,
+      "min_ms": 220.314,
+      "max_ms": 242.338,
+      "mask_shape": [
+        256,
+        256,
+        1
+      ],
+      "mask_dtype": "uint8"
+    },
+    "selfie_multiclass_confidence_256x256": {
+      "n": 30,
+      "mean_ms": 220.397,
+      "median_ms": 219.646,
+      "p95_ms": 225.121,
+      "min_ms": 217.403,
+      "max_ms": 227.64,
+      "mask_shape": [
+        256,
+        256,
+        1
+      ],
+      "mask_dtype": "float32"
+    },
+    "preproc_resize_bgr2rgb_wrap_320x180": {
+      "n": 30,
+      "mean_ms": 3.007,
+      "median_ms": 2.973,
+      "p95_ms": 3.14,
+      "min_ms": 2.896,
+      "max_ms": 3.349
+    }
+  },
+  "pose": {
+    "pose_lite_720p": {
+      "n": 30,
+      "mean_ms": 25.498,
+      "median_ms": 24.929,
+      "p95_ms": 29.203,
+      "min_ms": 23.901,
+      "max_ms": 32.772,
+      "poses_detected": 1,
+      "landmarks_per_pose": 33
+    },
+    "pose_lite_720p_mask": {
+      "n": 30,
+      "mean_ms": 39.029,
+      "median_ms": 38.815,
+      "p95_ms": 40.533,
+      "min_ms": 37.493,
+      "max_ms": 41.306,
+      "poses_detected": 1,
+      "landmarks_per_pose": 33,
+      "mask_shape": [
+        720,
+        1280,
+        1
+      ],
+      "mask_dtype": "float32"
+    },
+    "pose_lite_640x360": {
+      "n": 30,
+      "mean_ms": 24.704,
+      "median_ms": 24.555,
+      "p95_ms": 25.973,
+      "min_ms": 23.635,
+      "max_ms": 27.799,
+      "poses_detected": 1,
+      "landmarks_per_pose": 33
+    },
+    "pose_lite_640x360_mask": {
+      "n": 30,
+      "mean_ms": 29.715,
+      "median_ms": 29.261,
+      "p95_ms": 32.319,
+      "min_ms": 27.757,
+      "max_ms": 32.897,
+      "poses_detected": 1,
+      "landmarks_per_pose": 33,
+      "mask_shape": [
+        360,
+        640,
+        1
+      ],
+      "mask_dtype": "float32"
+    },
+    "pose_full_720p": {
+      "n": 30,
+      "mean_ms": 40.368,
+      "median_ms": 39.48,
+      "p95_ms": 47.745,
+      "min_ms": 35.104,
+      "max_ms": 50.601,
+      "poses_detected": 1,
+      "landmarks_per_pose": 33
+    },
+    "pose_full_720p_mask": {
+      "n": 30,
+      "mean_ms": 50.698,
+      "median_ms": 50.133,
+      "p95_ms": 53.171,
+      "min_ms": 48.709,
+      "max_ms": 59.874,
+      "poses_detected": 1,
+      "landmarks_per_pose": 33,
+      "mask_shape": [
+        720,
+        1280,
+        1
+      ],
+      "mask_dtype": "float32"
+    },
+    "pose_full_640x360": {
+      "n": 30,
+      "mean_ms": 36.935,
+      "median_ms": 35.964,
+      "p95_ms": 40.667,
+      "min_ms": 34.781,
+      "max_ms": 45.559,
+      "poses_detected": 1,
+      "landmarks_per_pose": 33
+    },
+    "pose_full_640x360_mask": {
+      "n": 30,
+      "mean_ms": 41.115,
+      "median_ms": 40.571,
+      "p95_ms": 43.978,
+      "min_ms": 38.815,
+      "max_ms": 53.281,
+      "poses_detected": 1,
+      "landmarks_per_pose": 33,
+      "mask_shape": [
+        360,
+        640,
+        1
+      ],
+      "mask_dtype": "float32"
+    }
+  },
+  "gl": {
+    "info": {
+      "GL_VENDOR": "NVIDIA Corporation",
+      "GL_RENDERER": "NVIDIA GeForce GTX 1650 Ti/PCIe/SSE2",
+      "GL_VERSION": "3.3.0 NVIDIA 591.86",
+      "version_code": 330,
+      "max_texture_size": 32768
+    },
+    "upload_1280x720: write RGB from prebuilt bytes": {
+      "n": 30,
+      "mean_ms": 1.583,
+      "median_ms": 1.482,
+      "p95_ms": 2.224,
+      "min_ms": 1.389,
+      "max_ms": 3.03
+    },
+    "upload_1280x720: write RGBA from prebuilt bytes": {
+      "n": 30,
+      "mean_ms": 0.48,
+      "median_ms": 0.498,
+      "p95_ms": 0.634,
+      "min_ms": 0.343,
+      "max_ms": 0.687
+    },
+    "upload_1280x720: write BGR numpy array directly (no conversion)": {
+      "n": 30,
+      "mean_ms": 1.46,
+      "median_ms": 1.435,
+      "p95_ms": 1.609,
+      "min_ms": 1.39,
+      "max_ms": 1.627
+    },
+    "upload_1280x720: cv2.cvtColor BGR2RGB + write": {
+      "n": 30,
+      "mean_ms": 3.411,
+      "median_ms": 3.355,
+      "p95_ms": 3.872,
+      "min_ms": 3.037,
+      "max_ms": 4.088
+    },
+    "upload_1280x720: cv2.cvtColor BGR2RGBA + write": {
+      "n": 30,
+      "mean_ms": 2.815,
+      "median_ms": 2.796,
+      "p95_ms": 3.055,
+      "min_ms": 2.589,
+      "max_ms": 3.147
+    },
+    "upload_1280x720: numpy [:, :, ::-1] + ascontiguous + tobytes + write": {
+      "n": 30,
+      "mean_ms": 14.284,
+      "median_ms": 14.048,
+      "p95_ms": 15.665,
+      "min_ms": 12.935,
+      "max_ms": 16.428
+    },
+    "8_fullscreen_passes_1920x1080": {
+      "n": 30,
+      "mean_ms": 1.597,
+      "median_ms": 1.468,
+      "p95_ms": 2.176,
+      "min_ms": 1.289,
+      "max_ms": 4.428
+    },
+    "fbo_read_rgb_1920x1080": {
+      "n": 30,
+      "mean_ms": 3.174,
+      "median_ms": 3.084,
+      "p95_ms": 3.66,
+      "min_ms": 2.849,
+      "max_ms": 3.885
+    },
+    "8_fullscreen_passes_2560x1440": {
+      "n": 30,
+      "mean_ms": 2.266,
+      "median_ms": 2.186,
+      "p95_ms": 2.784,
+      "min_ms": 2.067,
+      "max_ms": 3.209
+    },
+    "fbo_read_rgb_2560x1440": {
+      "n": 30,
+      "mean_ms": 5.429,
+      "median_ms": 5.431,
+      "p95_ms": 5.773,
+      "min_ms": 5.143,
+      "max_ms": 6.026
+    }
+  },
+  "errors": {}
+}

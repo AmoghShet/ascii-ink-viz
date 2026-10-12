@@ -1,0 +1,180 @@
+[
+  {
+    "backend": "DSHOW",
+    "requested": [
+      640,
+      480
+    ],
+    "fourcc_req": null,
+    "set_order": "size_first",
+    "open_ms": 1108.0,
+    "opened": true,
+    "negotiated": [
+      640,
+      480
+    ],
+    "fourcc_got": "YUY2",
+    "reported_fps": 30.00003000003,
+    "frames_in_budget": 114,
+    "read_fails": 0,
+    "achieved_fps": 14.2,
+    "read_ms_mean": 70.1,
+    "read_ms_max": 390.2,
+    "frame_shape": [
+      480,
+      640,
+      3
+    ],
+    "mean_brightness_0_255": 125.0,
+    "release_hung": false
+  },
+  {
+    "backend": "DSHOW",
+    "requested": [
+      640,
+      480
+    ],
+    "fourcc_req": "MJPG",
+    "set_order": "fourcc_first",
+    "open_ms": 747.0,
+    "opened": true,
+    "fourcc_set_ok": true,
+    "negotiated": [
+      640,
+      480
+    ],
+    "fourcc_got": "YUY2",
+    "reported_fps": 30.00003000003,
+    "frames_in_budget": 112,
+    "read_fails": 0,
+    "achieved_fps": 14.0,
+    "read_ms_mean": 71.2,
+    "read_ms_max": 598.1,
+    "frame_shape": [
+      480,
+      640,
+      3
+    ],
+    "mean_brightness_0_255": 125.8,
+    "release_hung": false
+  },
+  {
+    "backend": "DSHOW",
+    "requested": [
+      640,
+      480
+    ],
+    "fourcc_req": "MJPG",
+    "set_order": "size_first",
+    "open_ms": 728.0,
+    "opened": true,
+    "fourcc_set_ok": true,
+    "negotiated": [
+      640,
+      480
+    ],
+    "fourcc_got": "YUY2",
+    "reported_fps": 30.00003000003,
+    "frames_in_budget": 111,
+    "read_fails": 0,
+    "achieved_fps": 13.9,
+    "read_ms_mean": 71.8,
+    "read_ms_max": 598.6,
+    "frame_shape": [
+      480,
+      640,
+      3
+    ],
+    "mean_brightness_0_255": 125.5,
+    "release_hung": false
+  },
+  {
+    "backend": "DSHOW",
+    "requested": [
+      1280,
+      720
+    ],
+    "fourcc_req": "MJPG",
+    "set_order": "fourcc_first",
+    "open_ms": 788.0,
+    "opened": true,
+    "fourcc_set_ok": true,
+    "negotiated": [
+      1280,
+      720
+    ],
+    "fourcc_got": "YUY2",
+    "reported_fps": 30.00003000003,
+    "frames_in_budget": 7,
+    "read_fails": 0,
+    "achieved_fps": 0.9,
+    "read_ms_mean": 1000.7,
+    "read_ms_max": 1001.0,
+    "frame_shape": [
+      720,
+      1280,
+      3
+    ],
+    "mean_brightness_0_255": 0.0,
+    "release_hung": false
+  },
+  {
+    "backend": "DSHOW",
+    "requested": [
+      1280,
+      720
+    ],
+    "fourcc_req": "MJPG",
+    "set_order": "size_first",
+    "open_ms": 723.0,
+    "opened": true,
+    "fourcc_set_ok": true,
+    "negotiated": [
+      1280,
+      720
+    ],
+    "fourcc_got": "YUY2",
+    "reported_fps": 30.00003000003,
+    "frames_in_budget": 7,
+    "read_fails": 0,
+    "achieved_fps": 0.9,
+    "read_ms_mean": 1000.4,
+    "read_ms_max": 1000.9,
+    "frame_shape": [
+      720,
+      1280,
+      3
+    ],
+    "mean_brightness_0_255": 0.0,
+    "release_hung": false
+  },
+  {
+    "backend": "DSHOW",
+    "requested": [
+      1280,
+      720
+    ],
+    "fourcc_req": null,
+    "set_order": "size_first",
+    "open_ms": 708.0,
+    "opened": true,
+    "negotiated": [
+      1280,
+      720
+    ],
+    "fourcc_got": "YUY2",
+    "reported_fps": 30.00003000003,
+    "frames_in_budget": 7,
+    "read_fails": 0,
+    "achieved_fps": 0.9,
+    "read_ms_mean": 1000.3,
+    "read_ms_max": 1000.7,
+    "frame_shape": [
+      720,
+      1280,
+      3
+    ],
+    "mean_brightness_0_255": 0.0,
+    "release_hung": false
+  }
+]
