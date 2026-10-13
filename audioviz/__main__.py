@@ -1,4 +1,4 @@
-"""AudioViz command line.
+"""ASCII Ink Visualizer command line.
 
   python -m audioviz play [song.mp3] [--seed N] [--preset ink_cold] [--aspect 16:9|9:16] [--camera]
   python -m audioviz export song.mp3 --seed N --size 1920x1080 [--fps 24] --out file.mp4
@@ -19,7 +19,7 @@ def _size(s):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(prog="audioviz", description="Ink smoke in ASCII: generative audio visualizer")
+    ap = argparse.ArgumentParser(prog="audioviz", description="ASCII Ink Visualizer: an ASCII/fluid-based, audio-reactive visualizer")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     p = sub.add_parser("play", help="live window")

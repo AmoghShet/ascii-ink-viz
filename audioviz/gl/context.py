@@ -19,7 +19,7 @@ def is_darwin():
     return sys.platform == "darwin"
 
 
-def create_window(title="AudioViz", size=(1280, 720), fullscreen=False, vsync=True, visible=True):
+def create_window(title="ASCII Ink Visualizer", size=(1280, 720), fullscreen=False, vsync=True, visible=True):
     """Create a GLFW window with a 4.1 core context. Returns the moderngl-window window object."""
     import moderngl_window as mglw
 
@@ -85,7 +85,7 @@ def renderer_name(ctx):
 def _m0_check():
     import time
 
-    window = create_window(title="AudioViz M0 check", size=(640, 360))
+    window = create_window(title="ASCII Ink Visualizer M0 check", size=(640, 360))
     ctx = window.ctx
     info = gl_info(ctx)
     for k, v in info.items():

@@ -1,0 +1,5 @@
+# macpatch/mac.patch carries CRLF and LF lines byte for byte (6 of the patched files are committed
+# with CRLF), so git must never convert it. The scripts need their platform's line endings.
+macpatch/mac.patch -text
+macpatch/*.sh text eol=lf
+macpatch/*.cmd text eol=crlf

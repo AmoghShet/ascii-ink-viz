@@ -17,7 +17,7 @@ How to orient after a reset: read "Status board" first, then the newest log entr
 | M3 ASCII | DONE 02:06 | orientation 100%, P6 0.36 ms |
 | M4 Audio | DONE 02:16 (sync by ear = user) | 0 underflows full song, GPU 5.1 ms, mapping checks PASS |
 | M5 Determinism + export | DONE 02:17 | md5 identical x3, 94.5 fps 1080p60, A/V 20.00/20.01 s |
-| M6 Mac validation | PREPARED (needs a Mac) | Darwin paths in code + tested on Windows; checklist docs/MAC_VALIDATION.md |
+| M6 Mac validation | DONE 2026-10-13 20:20 on MacBook Neo (A18 Pro), with MacPatch | 6 fixes kept as a patch (not merged): macpatch/MACPATCH.md; M1-class Mac not run |
 | M7 Camera stir | DONE 02:16 (look = user) | plumbing PASS on C270 + synthetic; stir verified headless |
 
 ## Facts worth keeping
@@ -159,3 +159,19 @@ How to orient after a reset: read "Status board" first, then the newest log entr
 - User: "leave M6 for now. now save everything to my github" (declined running M6 on a GitHub Actions macos-14 VM runner).
 - Private repo https://github.com/AmoghShet/audioviz (main, commit f5471cc): code, shaders, presets, tests, docs (incl. docs/PLAN.md copy of the plan), README, this log, research doc, bench scripts + JSON results. Excluded by .gitignore: .venv*, .cache/, out/ (renders and screenshots with the user's camera feed), bench/*.jpg|png (webcam stills and ASCII renders of them), models/ (MediaPipe, unused), all audio files.
 - Status: M0-M5, M7 DONE and verified on Windows; M6 DEFERRED (no Mac reachable; checklist docs/MAC_VALIDATION.md).
+
+### 2026-10-13 20:20 M6 on the MacBook Neo (A18 Pro, 8 GB, macOS 27.0.1); fixes kept as a patch
+- Venv from Homebrew python3.12 (3.12.10); every pinned requirement installed from arm64 wheels. Test song: "Everything In Its Right Place.mp3" (193.7 s, 120.2 BPM; analysis 28.7 s).
+- M0 PASS: `4.1 Metal - 91.7`, renderer `Apple A18 Pro`, point sizes 1..64, buffer 2x window; headless context identical. `detect_tier` -> `low`.
+- Six fixes were needed. They are NOT merged: the user wants the Windows code unchanged, so they live in `macpatch/mac.patch` (apply with `macpatch/apply.sh`; details in `macpatch/MACPATCH.md`):
+  1. `noise3` clashes with the GLSL 4.1 built-in `vec3 noise3(vec3)`. NVIDIA allowed it; Apple rejects it, so no shader compiled. Renamed to `gnoise3`.
+  2. `window_size_for` divided the macOS video mode (already in points) by the content scale: 577x324 pt window. Skipped on darwin -> 1154x649 pt, 2308x1298 buffer.
+  3. Tier controller false drops: Apple GPUs clock down when there is slack, so GPU ms fills the frame (`low`: 11.3 ms at vsync vs 4.6 ms with --no-vsync). It dropped low -> min every run at 60 fps. A drop now also needs mean frame time > 25 ms (`Tunables.tier_drop_frame_ms`, `--tier-drop-frame-ms`). This also changes Windows behaviour slightly.
+  4. Camera: the Mac camera has no 640x480 mode (1280x720 and up). Capture 720p and centre-crop to 4:3 in ffmpeg; downstream unchanged.
+  5. Camera devices by name on macOS (Continuity iPhone "Big Tim Camera" was index 1); prefer the built-in.
+  6. `tests/live_features.py` song from `AUDIOVIZ_TEST_SONG`.
+- Patched results: dummy PASS; m1/m2 visual checks PASS (GPU 7.5-10.8 ms at 1M particles vs the 1650 Ti's 6/7 ms thresholds, expected); m3 PASS (orientation 100%, P6 0.48 ms); full song live on `low`: 0 underflows, 0 dropped steps, latency 14 ms; verify_export PASS (md5 c26cf095... x3, 1080p60 at 74.6 fps); camera synthetic + verify_camera + verify_camera_smoke PASS; live --camera works from Terminal.app (user: "looks fine").
+- Camera permission: anything launched by the Claude desktop app never got a prompt; ffmpeg opened the camera and waited forever for frames (even outside the sandbox). Terminal.app prompts normally.
+- Open (not in the patch): the camera delivers 24 fps but the flow scale assumes 30 (stir about 25% strong); vsync does not fully pace the window (HUD 90-96 fps on 60 Hz); a hung camera leaves an orphaned ffmpeg; GPU timers are noisy (bench one tier per process); 12 fps look render frame slips a vsync (frame p95 27-33 ms).
+- Also: the project is now called "ASCII Ink Visualizer" (README, window title, HUD, CLI description); the package and command stay `audioviz`.
+- `macpatch/windows.cmd` reverts the MacPatch on Windows (tested with core.autocrlf=true: working-tree and committed patch both restore the pre-patch files exactly). `.gitattributes` pins mac.patch (-text), apply.sh (LF), windows.cmd (CRLF).

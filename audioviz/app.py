@@ -70,7 +70,7 @@ class App:
         aspect = args.aspect or self.preset["meta"].get("aspect", "16:9")
         aw, ah = (int(v) for v in aspect.split(":"))
         size = tuple(int(v) for v in args.size.split("x")) if args.size else window_size_for((aw, ah))
-        self.window = create_window(title="AudioViz", size=size, fullscreen=args.fullscreen, vsync=not args.no_vsync)
+        self.window = create_window(title="ASCII Ink Visualizer", size=size, fullscreen=args.fullscreen, vsync=not args.no_vsync)
         self.ctx = self.window.ctx
         info = gl_info(self.ctx)
         print(f"GL: {info['GL_RENDERER']} | {info['GL_VERSION']} | buffer {self.window.buffer_size}")
@@ -365,7 +365,7 @@ class App:
         ci = self.clock.info()
         dur = getattr(self.clock, "duration", float("inf"))
         lines = [
-            (f"AudioViz  seed {eng.seed}  preset {self.preset_name}  tier {eng.tier.name} ({eng.particles.N / 1e6:.2f}M)  "
+            (f"ASCII Ink Visualizer  seed {eng.seed}  preset {self.preset_name}  tier {eng.tier.name} ({eng.particles.N / 1e6:.2f}M)  "
              f"{eng.fb_size[0]}x{eng.fb_size[1]}  view {VIEWS[eng.view]}", 2),
             (f"fps {fps:5.1f} (look {self.look_fps})  gpu {gpu:5.2f} ms  steps/frame {self.steps_last}  song {_fmt_t(self.clock.time())} / "
              f"{_fmt_t(dur)}{'  [paused]' if self.clock.paused else ''}", 0),

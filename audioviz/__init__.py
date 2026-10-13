@@ -1,4 +1,4 @@
-"""AudioViz: "ink smoke in ASCII" generative audio visualizer.
+"""ASCII Ink Visualizer: an ASCII/fluid-based, audio-reactive visualizer (package `audioviz`).
 
 Particles follow a curl-noise flow field, leave an advected trail buffer, and the result is drawn
 as ASCII glyphs on black. The song drives the parameters; a seed makes each run different.

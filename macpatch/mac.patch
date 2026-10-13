@@ -1,0 +1,217 @@
+diff --git a/audioviz/__main__.py b/audioviz/__main__.py
+index 5da9273..2e26acc 100644
+--- a/audioviz/__main__.py
++++ b/audioviz/__main__.py
+@@ -41,6 +41,8 @@ def main(argv=None):
+     p.add_argument("--no-hud", action="store_true")
+     p.add_argument("--verbose", action="store_true", help="log clock resyncs and dropped steps")
+     p.add_argument("--tier-drop-ms", type=float, help="override the GPU p95 that triggers a tier drop (testing)")
++    p.add_argument("--tier-drop-frame-ms", type=float,
++                   help="override the mean frame time that must also be exceeded for a tier drop (testing; 0 = GPU only)")
+     p.add_argument("--look-fps", type=int, choices=[12, 24, 60], help="picture update rate (default: preset grain.frame_rate)")
+     p.add_argument("--no-vsync", action="store_true")
+     p.add_argument("--quit-after", type=float, default=None, help="seconds; for unattended tests")
+diff --git a/audioviz/app.py b/audioviz/app.py
+index 4623868..1b5e3fd 100644
+--- a/audioviz/app.py
++++ b/audioviz/app.py
+@@ -47,7 +47,9 @@ def window_size_for(aspect_wh, frac=0.82):
+         glfw.init()
+         mon = glfw.get_primary_monitor()
+         mode = glfw.get_video_mode(mon)
+-        sx, sy = glfw.get_monitor_content_scale(mon)
++        # Windows: the video mode is in pixels and SCALE_TO_MONITOR scales the requested size up,
++        # so ask for pixels / scale. macOS: the video mode and window sizes are both in points.
++        sx, sy = (1.0, 1.0) if sys.platform == "darwin" else glfw.get_monitor_content_scale(mon)
+         sw, sh = mode.size.width / sx, mode.size.height / sy
+     except Exception:
+         sw, sh = 1536, 864
+@@ -128,6 +130,8 @@ class App:
+         self._last_errors = {}
+         if getattr(args, "tier_drop_ms", None):
+             self.tun.tier_drop_ms = args.tier_drop_ms
++        if getattr(args, "tier_drop_frame_ms", None) is not None:
++            self.tun.tier_drop_frame_ms = args.tier_drop_frame_ms
+ 
+         self.auto_keys = parse_auto_keys(getattr(args, "auto_keys", ""))
+         self.window.key_event_func = self.on_key
+@@ -518,9 +522,14 @@ class App:
+             return
+         if now < self.tier_cooldown_until or len(self.gpu_hist) < self.gpu_hist.maxlen:
+             return
+-        if np.percentile(self.gpu_hist, 95) > self.tun.tier_drop_ms:
++        # GPU ms alone is not load: a GPU with slack clocks down until its work fills the frame
++        # (A18 Pro at vsync: 11 ms on the same tier that measures 4.6 ms unthrottled). Drop only
++        # while frames are actually late too.
++        frame_ms = 1000.0 * float(np.mean(list(self.frame_times)[-self.tun.tier_drop_frames:]))
++        if np.percentile(self.gpu_hist, 95) > self.tun.tier_drop_ms and frame_ms > self.tun.tier_drop_frame_ms:
+             if eng.lower_tier():
+-                self.last_change = f"auto tier drop -> {eng.tier.name} (p95 gpu > {self.tun.tier_drop_ms} ms)"
++                self.last_change = (f"auto tier drop -> {eng.tier.name} (p95 gpu > {self.tun.tier_drop_ms} ms, "
++                                    f"mean frame {frame_ms:.1f} ms, song {_fmt_t(self.clock.time())})")
+                 print(self.last_change)
+             self.gpu_hist.clear()
+             self.tier_cooldown_until = now + 5.0
+diff --git a/audioviz/config.py b/audioviz/config.py
+index 653d8ea..bd70fb1 100644
+--- a/audioviz/config.py
++++ b/audioviz/config.py
+@@ -50,6 +50,9 @@ class Tunables:
+     flow_div: int = 4                # flow field at 1/4 res
+     tier_drop_ms: float = 14.0       # rolling p95 GPU frame time that triggers a tier drop
+     tier_drop_frames: int = 60       # ...sustained for this many frames
++    tier_drop_frame_ms: float = 25.0 # ...while the mean frame time over those frames is above this: every
++                                     # frame late at 60 Hz is >= 33 ms; a 12 fps look whose render frame
++                                     # alone slips a vsync averages 20 ms (picture jitter, not overload)
+     dummy_attrib: bool = field(default_factory=is_darwin)   # Apple: empty VAOs may draw nothing
+     timers: bool = True
+     hud: bool = True
+diff --git a/audioviz/inputs/camera.py b/audioviz/inputs/camera.py
+index 9d3fbe9..fca71ae 100644
+--- a/audioviz/inputs/camera.py
++++ b/audioviz/inputs/camera.py
+@@ -3,7 +3,9 @@
+ The camera image is never shown. Capture goes through the ffmpeg binary bundled with imageio-ffmpeg
+ (MJPEG over DirectShow on Windows, AVFoundation on macOS), because OpenCV's DirectShow backend
+ cannot negotiate MJPEG on the Logitech C270 and requesting 1280x720 without MJPEG wedges that
+-camera until it is replugged. This module only ever asks for 640x480 MJPEG.
++camera until it is replugged. This module only ever asks for 640x480 MJPEG there. Mac cameras
++have no 640x480 mode (the MacBook Neo camera starts at 1280x720), so macOS captures 720p and
++ffmpeg centre-crops it to 4:3; everything after the pipe is the same on both.
+ 
+ Threads: a capture thread reads frames from the ffmpeg pipe and computes flow (DIS ULTRAFAST at
+ 320x240, ~1-3 ms); the render thread only uploads the newest flow field. A watchdog zeroes the
+@@ -22,7 +24,7 @@ import time
+ import cv2
+ import numpy as np
+ 
+-CAP_SIZE = (640, 480)
++CAP_SIZE = (1280, 720) if sys.platform == "darwin" else (640, 480)
+ CAP_FPS = 30
+ FLOW_SIZE = (240, 180)   # 4:3 like the capture; DIS ULTRAFAST here is ~1 ms
+ BG_SIZE = (480, 360)     # what ffmpeg delivers: drawn into the smoke; downsized 2x for the flow
+@@ -42,7 +44,7 @@ def ffmpeg_exe():
+ 
+ 
+ def list_video_devices():
+-    """Names of video capture devices (Windows dshow) or indices (macOS avfoundation)."""
++    """Names of video capture devices (Windows dshow, macOS avfoundation; both accept the name)."""
+     exe = ffmpeg_exe()
+     if sys.platform.startswith("win"):
+         cmd = [exe, "-hide_banner", "-list_devices", "true", "-f", "dshow", "-i", "dummy"]
+@@ -76,7 +78,7 @@ def list_video_devices():
+             elif sect:
+                 m = re.search(r"\[(\d+)\]\s+(.+)$", line)
+                 if m and "Capture screen" not in m.group(2):
+-                    names.append(m.group(1))
++                    names.append(m.group(2).strip())   # indices shift as Continuity cameras come and go
+         return names
+     return ["/dev/video0"]
+ 
+@@ -91,7 +93,8 @@ def capture_cmd(device, w=CAP_SIZE[0], h=CAP_SIZE[1], fps=CAP_FPS):
+         inp = ["-f", "avfoundation", "-framerate", str(fps), "-video_size", f"{w}x{h}", "-i", f"{device}:none"]
+     else:
+         inp = ["-f", "v4l2", "-input_format", "mjpeg", "-video_size", f"{w}x{h}", "-framerate", str(fps), "-i", device]
+-    vf = f"hflip,scale={BG_SIZE[0]}:{BG_SIZE[1]}:flags=area"
++    crop = "" if w * 3 == h * 4 else "crop=ih*4/3:ih,"   # wider than 4:3 (Mac 720p): centre crop
++    vf = f"{crop}hflip,scale={BG_SIZE[0]}:{BG_SIZE[1]}:flags=area"
+     return common + inp + ["-vf", vf, "-f", "rawvideo", "-pix_fmt", "gray", "-"]
+ 
+ 
+@@ -314,7 +317,8 @@ class CameraStir:
+         self.t_start_wall = None
+ 
+     def describe(self):
+-        return "synthetic blob" if self.synthetic else f"device {self.device!r} (ffmpeg MJPEG 640x480)"
++        fmt = "AVFoundation" if sys.platform == "darwin" else "MJPEG"
++        return "synthetic blob" if self.synthetic else f"device {self.device!r} (ffmpeg {fmt} {CAP_SIZE[0]}x{CAP_SIZE[1]})"
+ 
+     def start(self):
+         import multiprocessing as mp
+@@ -324,7 +328,9 @@ class CameraStir:
+             devs = list_video_devices()
+             if not devs:
+                 raise RuntimeError("no video capture device found")
+-            pref = [d for d in devs if "c270" in d.lower() or "webcam" in d.lower() or "camera" in d.lower()]
++            # the webcam / built-in camera before any other "camera" (a Continuity iPhone on macOS)
++            pref = [d for d in devs if any(k in d.lower() for k in ("c270", "webcam", "facetime", "macbook", "built-in"))]
++            pref = pref or [d for d in devs if "camera" in d.lower()]
+             self.device = (pref or devs)[0]
+         self.shm = shared_memory.SharedMemory(create=True, size=_HDR_BYTES + _FLOW_BYTES + _FRAME_BYTES)
+         self.hdr, self.flow_view, self.frame_view = _views(self.shm.buf)
+diff --git a/audioviz/shaders/common.glsl b/audioviz/shaders/common.glsl
+index cfa8a72..6c8a633 100644
+--- a/audioviz/shaders/common.glsl
++++ b/audioviz/shaders/common.glsl
+@@ -28,7 +28,9 @@ vec3 lattice_grad(ivec3 c) {
+     return g;
+ }
+ 
+-float noise3(vec3 x) {
++// Not "noise3": GLSL 4.1 has a built-in vec3 noise3(vec3). NVIDIA lets a float overload shadow
++// it; Apple's compiler rejects the redeclaration.
++float gnoise3(vec3 x) {
+     vec3 fl = floor(x);
+     ivec3 i = ivec3(fl);
+     vec3 f = x - fl;
+@@ -47,8 +49,8 @@ float noise3(vec3 x) {
+ // Curl of a scalar potential: divergence-free 2D velocity. Divided by nothing: caller scales.
+ vec2 curl(vec2 p, float z) {
+     const float e = 0.01;
+-    float dx = noise3(vec3(p.x + e, p.y, z)) - noise3(vec3(p.x - e, p.y, z));
+-    float dy = noise3(vec3(p.x, p.y + e, z)) - noise3(vec3(p.x, p.y - e, z));
++    float dx = gnoise3(vec3(p.x + e, p.y, z)) - gnoise3(vec3(p.x - e, p.y, z));
++    float dy = gnoise3(vec3(p.x, p.y + e, z)) - gnoise3(vec3(p.x, p.y - e, z));
+     return vec2(dy, -dx) / (2.0 * e);
+ }
+ 
+diff --git a/audioviz/shaders/grade.frag b/audioviz/shaders/grade.frag
+index 8e76537..cde9901 100644
+--- a/audioviz/shaders/grade.frag
++++ b/audioviz/shaders/grade.frag
+@@ -63,8 +63,8 @@ void main() {
+     // smoke. Smoke always wins: only cells the smoke and the camera leave empty get haze.
+     if (u_hazeA.x > 0.0 && r < 0.035) {
+         vec2 hp = uv_to_p(cuv) * u_hazeA.z - u_simE.xy * u_time.x * 2.0;
+-        float n = 0.65 * noise3(vec3(hp, u_time.x * u_hazeA.w))
+-                + 0.35 * noise3(vec3(hp * 2.7 + 11.0, u_time.x * u_hazeA.w * 2.3));
++        float n = 0.65 * gnoise3(vec3(hp, u_time.x * u_hazeA.w))
++                + 0.35 * gnoise3(vec3(hp * 2.7 + 11.0, u_time.x * u_hazeA.w * 2.3));
+         float h = smoothstep(-0.1, 0.45, n);
+         uint ch = uint(cell.x) * 2654435761u ^ uint(cell.y) * 40503u ^ 0xA2E1u;
+         if (hash1(ch, u_seedU.y) < u_hazeA.x * h) r = -max(h, 0.05);
+diff --git a/audioviz/shaders/trails.frag b/audioviz/shaders/trails.frag
+index b1ed374..19a06d6 100644
+--- a/audioviz/shaders/trails.frag
++++ b/audioviz/shaders/trails.frag
+@@ -27,7 +27,7 @@ void main() {
+         vec2 gh = texture(u_ghost, v_uv - warp).rg;
+         float c = max(gh.r, u_camE.z * gh.g);   // live image bright, trails gray
+         vec2 pp = uv_to_p(v_uv);
+-        float n = 0.65 * noise3(vec3(pp * 7.0, u_time.x * 0.5)) + 0.35 * noise3(vec3(pp * 19.0 + 3.1, u_time.x * 1.1));
++        float n = 0.65 * gnoise3(vec3(pp * 7.0, u_time.x * 0.5)) + 0.35 * gnoise3(vec3(pp * 19.0 + 3.1, u_time.x * 1.1));
+         c *= mix(1.0, smoothstep(-0.25, 0.45, n), u_camD.z);
+         float target = c * u_camD.x;
+         float a = 1.0 - pow(1.0 - u_camD.y, steps60);
+diff --git a/tests/live_features.py b/tests/live_features.py
+index e0ad1e3..8fcbf5a 100644
+--- a/tests/live_features.py
++++ b/tests/live_features.py
+@@ -16,7 +16,7 @@ import time
+ 
+ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ PY = sys.executable
+-SONG = "D:/Downloads/Sit Down. Stand Up.mp3"
++SONG = os.environ.get("AUDIOVIZ_TEST_SONG", "D:/Downloads/Sit Down. Stand Up.mp3")
+ OUT = os.path.join(ROOT, "out", "verify")
+ 
+ 
+@@ -106,7 +106,7 @@ def check_resize():
+ 
+ 
+ def check_tier():
+-    rc, out, stats = play(["--seed", "6", "--tier-drop-ms", "2.0"], 30)
++    rc, out, stats = play(["--seed", "6", "--tier-drop-ms", "2.0", "--tier-drop-frame-ms", "0"], 30)
+     drops = [ln for ln in out if "auto tier drop" in ln]
+     return {"rc": rc, "drops": drops, "tier_end": stats.get("tier_end"), "pass": rc == 0 and len(drops) >= 1}
+ 

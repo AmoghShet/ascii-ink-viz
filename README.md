@@ -1,23 +1,45 @@
-# AudioViz: ink smoke in ASCII
+# ASCII Ink Visualizer
 
-A generative visualizer for dark electronic music. About a million particles follow a curl-noise
-flow field and leave advected trails, so the frame looks like ink in water. The whole frame is
-then drawn as ASCII glyphs on black, with glyphs oriented along the flow. The song drives the
-motion; every seed gives a different run inside the same cold monochrome look. The webcam can
-optionally stir the smoke and show up as a dim gray field of glyphs behind it.
+An ASCII/fluid-based, audio-reactive visualizer. Up to 1M particles move through a curl-noise flow
+field on the GPU and leave trails that drift with the same flow. Each frame is drawn as ASCII
+characters on black, and the characters follow the flow direction; a sideways stream draws as `-`,
+a rising one as `|`. The song is analysed once (bands, kicks, hats, beats, sections) and that
+analysis drives the motion. The seed changes the emitter layout, palette and glyph set; the colours
+stay black, grey and a little cyan. The webcam is optional: your movement pushes the particles
+around and you show up in the frame as characters.
 
-Runs on Windows (OpenGL 4.1 core through moderngl) and is written for Apple Silicon Macs (4.1 core
-is the macOS ceiling; see `docs/MAC_VALIDATION.md`).
+Runs on Windows (OpenGL 4.1 core through moderngl) and on Apple Silicon Macs with the MacPatch
+(4.1 core is the macOS ceiling). The Mac support was validated on a MacBook Neo (A18 Pro). The
+Python package and command are still called `audioviz` (`python -m audioviz ...`).
 
 ## Setup
+
+Windows:
 
 ```bash
 uv venv --python 3.12 .venv
 uv pip install --python .venv/Scripts/python.exe -r requirements.txt
 ```
 
-On this machine the venv already exists at `D:\AudioViz\.venv`. Run everything as
+On the Windows dev machine the venv already exists at `D:\AudioViz\.venv`. Run everything as
 `.venv/Scripts/python.exe -m audioviz ...` from `D:\AudioViz`.
+
+macOS (Apple Silicon): the committed code needs six small fixes on a Mac. They live in
+`macpatch/` as a patch, so the Windows code stays as verified. `macpatch/MACPATCH.md` explains
+each fix and has the Mac test results.
+
+```bash
+python3.12 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+macpatch/apply.sh
+.venv/bin/python -m audioviz check
+```
+
+On a Mac, use `.venv/bin/python` wherever this README says `.venv/Scripts/python.exe`. Run
+`--camera` from Terminal.app so macOS can ask for camera permission.
+
+If the MacPatch ends up applied on Windows (for example committed on a Mac and pulled), run
+`macpatch\windows.cmd` to take it back out (`macpatch\windows.cmd --status` checks first).
 
 ## Use
 
@@ -115,3 +137,5 @@ tone shape) are not randomised.
   `tests/verify_camera.py`, `tests/live_features.py`: milestone checks. Reports go to `out/verify/`.
 - `NOTES_build_log.md`: timestamped build log, status board, deviations from the plan.
 - `docs/MAC_VALIDATION.md`: the M6 checklist for a Mac.
+- `macpatch/`: the macOS fixes (`mac.patch`, `apply.sh` for macOS, `windows.cmd` to revert them on
+  Windows) and `MACPATCH.md` (what each fix does, Mac results, known issues).

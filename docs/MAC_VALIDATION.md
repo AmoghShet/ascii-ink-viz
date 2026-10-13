@@ -3,15 +3,21 @@
 M6 could not be run during the overnight build (no Mac on hand). Everything Mac-specific is already
 in the code; this is the list to run on an M1-class Mac and on the MacBook Neo (A18 Pro).
 
+**Status (2026-10-13):** run on a MacBook Neo (A18 Pro). The code needed six fixes, kept as a patch
+in `macpatch/`. Apply it before running this list. `macpatch/MACPATCH.md` has the fixes, the
+results and the known issues. An M1-class Mac has not been run yet.
+
 ## Setup (once per Mac)
 
 ```bash
 cd AudioViz
 python3.12 -m venv .venv            # or: uv venv --python 3.12
 .venv/bin/python -m pip install -r requirements.txt
+macpatch/apply.sh                   # the macOS fixes; without them step 2 fails to compile shaders
 ```
 
-Allow camera access for the terminal app when macOS asks (only needed for M7, `--camera`).
+Allow camera access for the terminal app when macOS asks (only needed for M7, `--camera`). Run it
+from Terminal.app: launchers that cannot show the permission prompt get no camera frames.
 
 ## What the code already does differently on macOS
 
