@@ -9,60 +9,65 @@ stay black, grey and a little cyan. The webcam is optional: your movement pushes
 around and you show up in the frame as characters.
 
 Runs on Windows (OpenGL 4.1 core through moderngl) and on Apple Silicon Macs with the MacPatch
-(4.1 core is the macOS ceiling). The Mac support was validated on a MacBook Neo (A18 Pro). The
-Python package and command are still called `audioviz` (`python -m audioviz ...`).
+(4.1 core is the macOS ceiling). The Python package is `audioviz`, so commands are
+`python -m audioviz ...`.
 
 ## Setup
+
+Needs Python 3.12. From the repo folder:
 
 Windows:
 
 ```bash
-uv venv --python 3.12 .venv
-uv pip install --python .venv/Scripts/python.exe -r requirements.txt
+py -3.12 -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+python -m audioviz check
 ```
 
-On the Windows dev machine the venv already exists at `D:\AudioViz\.venv`. Run everything as
-`.venv/Scripts/python.exe -m audioviz ...` from `D:\AudioViz`.
-
-macOS (Apple Silicon): the committed code needs six small fixes on a Mac. They live in
-`macpatch/` as a patch, so the Windows code stays as verified. `macpatch/MACPATCH.md` explains
-each fix and has the Mac test results.
+macOS (Apple Silicon):
 
 ```bash
 python3.12 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
+source .venv/bin/activate
+pip install -r requirements.txt
 macpatch/apply.sh
-.venv/bin/python -m audioviz check
+python -m audioviz check
 ```
 
-On a Mac, use `.venv/bin/python` wherever this README says `.venv/Scripts/python.exe`. Run
-`--camera` from Terminal.app so macOS can ask for camera permission.
+`check` opens a small window and prints the OpenGL version; it should say 4.1 and `M0: PASS`. The
+commands below assume the venv is active.
 
-If the MacPatch ends up applied on Windows (for example committed on a Mac and pulled), run
-`macpatch\windows.cmd` to take it back out (`macpatch\windows.cmd --status` checks first).
+On macOS the code needs six small fixes, kept in `macpatch/` as a patch so the Windows code stays
+unchanged; `macpatch/MACPATCH.md` explains each one. Run `--camera` from Terminal.app (or another
+terminal that can ask for camera permission). If the patch ever ends up applied on Windows, for
+example committed on a Mac and pulled, `macpatch\windows.cmd` takes it back out
+(`macpatch\windows.cmd --status` checks first).
 
 ## Use
 
-Play a song in a window (the first run analyses the song for ~25 s; later runs load it from
-`.cache/`):
+Play a song in a window. The first run analyses the song (about 30 s); later runs load the
+result from `.cache/`:
 
 ```bash
-.venv/Scripts/python.exe -m audioviz play "D:/Downloads/Myxomatosis.mp3"
+python -m audioviz play song.mp3
 ```
 
 Useful options: `--seed N` (default random), `--preset ink_cold_portrait` (tall frames; sets 9:16
 on its own), `--aspect 9:16`, `--fullscreen`, `--camera` (webcam
 stir) or `--camera synthetic` (a fake moving blob, for testing in the dark), `--click-test`
 (flashes on every beat, for setting the audio offset by ear), `--offset-ms 40`, `--tier mid`,
-`--debug-view density|flow`, `--look-fps 12|24|60` (picture update rate, default 24), `--mute` (clock runs, no sound), `--set sim.splat=0.004` (override
-any preset value). With no song it runs on a wall clock with neutral audio values.
+`--debug-view density|flow`, `--look-fps 12|24|60` (picture update rate, default 12), `--mute`
+(clock runs, no sound), `--set sim.splat=0.004` (override any preset value). With no song it runs
+on a wall clock with neutral audio values.
 
-Export a video (offline, deterministic, faster than real time at 1080p60). The file frame rate
-defaults to the look frame rate (24); `--fps 60` keeps the 24 fps look by repeating frames:
+Export a video (offline and deterministic: the same song, seed and settings give the same
+frames). The file frame rate defaults to the look frame rate (12); `--fps 60` keeps the 12 fps look
+by repeating frames:
 
 ```bash
-.venv/Scripts/python.exe -m audioviz export "D:/Downloads/Myxomatosis.mp3" --seed 7 --size 1920x1080 --fps 60 --out out/exports/myxo_7.mp4
-.venv/Scripts/python.exe -m audioviz export "D:/Downloads/Myxomatosis.mp3" --seed 7 --size 1080x1920 --fps 30 --out out/exports/myxo_7_portrait.mp4
+python -m audioviz export song.mp3 --seed 7 --size 1920x1080 --fps 60 --out out/exports/song_seed7.mp4
+python -m audioviz export song.mp3 --seed 7 --size 1080x1920 --fps 30 --out out/exports/song_seed7_portrait.mp4
 ```
 
 Every export writes `<name>_resolved_params.json` next to the mp4. Re-render exactly the same
@@ -90,8 +95,8 @@ features), `bench` (per-pass GPU timings per tier), `check` (OpenGL context chec
 | `,` `.` | audio offset -10 / +10 ms |
 | `E` | export this song and seed in the background (`out/exports/`) |
 | `C` | camera stir on/off (starts the camera if needed) |
-| `V` | camera background on/off (your feed as a dim gray sea of glyphs behind the smoke) |
-| `P` | frame-rate look: 24 / 60 / 12 fps (the simulation stays smooth underneath; the picture is held between updates) |
+| `V` | camera image in the frame on/off |
+| `P` | frame-rate look: 12 / 24 / 60 fps (the simulation stays smooth underneath; the picture is held between updates) |
 | `F` | fullscreen |
 | `T` | step down one particle tier |
 | `Esc` | quit |
